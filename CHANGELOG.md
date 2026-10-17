@@ -3,6 +3,19 @@
 Template users: compare your copy against the version you started from and pull what you need —
 the core is Markdown plus a few POSIX scripts, so upgrades are file copies, not migrations.
 
+## v1.9 — First-class Antigravity (Gemini) adapter
+
+- `adapters/antigravity/`: first-class adapter for Google Antigravity and Gemini models (`./scripts/init antigravity` or `./scripts/init agy`). Installs `GEMINI.md` (thin pointer to `AGENTS.md` + `ask_question` guidance for the proposal rule), `.agents/skills/<name>/SKILL.md` for all 12 workflow/segment commands (plus `/anew-plan` as a non-colliding alias for `/plan`), and `.agents/hooks.json` with two `PreToolUse` lifecycle hooks:
+  - `protect-shipped.sh`: enforces `specs/done/` immutability (`decision: "deny"`) across both file-edit tools (`TargetFile`) and shell commands (`CommandLine`).
+  - `safety-guard.sh`: enforces denial of destructive git and filesystem commands (`git push --force`, `git reset --hard`, `git rebase`, `rm -rf`).
+- Producer ≠ verifier (`AGENTS.md` rule 3) is **Enforced** in Antigravity: `/review` and `/new-feature` dynamically define and invoke a read-only `anew-reviewer` subagent (`define_subagent` with `enable_write_tools: false` + `invoke_subagent`).
+- `scripts/doctor` and `scripts/selftest`: validate Antigravity adapter presence, 12-command skill parity, hook executable bits, and hook `deny` behavior.
+- README enforcement table gains the **Antigravity (Gemini)** column; ADR 0010 records the adapter design decisions.
+
+### Upgrading
+
+Copy `adapters/antigravity/`, `scripts/init`, `scripts/doctor`, and `scripts/selftest`, then run `./scripts/init antigravity` to wire the workspace for Antigravity.
+
 ## v1.8 — ANEW proves its own scripts
 
 - `scripts/selftest`: 50 scenario checks that `scripts/check` (profiles, tags, failures, arguments,

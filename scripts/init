@@ -1,6 +1,6 @@
 #!/bin/sh
 # ANEW init — installs an AI tool adapter into the repo root.
-# Usage: ./scripts/init [--force] <claude-code|github-copilot|cursor|generic>
+# Usage: ./scripts/init [--force] <antigravity|claude-code|github-copilot|cursor|generic>
 # Existing files are kept unless --force is given, so customized commands are never lost silently.
 set -e
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -12,6 +12,7 @@ usage() {
   echo "Usage: ./scripts/init [--force] <adapter>"
   echo ""
   echo "Available adapters:"
+  echo "  antigravity      GEMINI.md + .agents/ (skills, lifecycle hooks, read-only reviewer subagent) [alias: agy]"
   echo "  claude-code      CLAUDE.md + .claude/ (commands, reviewer subagent, permissions, hooks)"
   echo "  github-copilot   .github/ (copilot-instructions.md, prompts/, agents/, instructions/)"
   echo "  cursor           .cursor/ (rules/, commands/)"
@@ -41,6 +42,13 @@ put_dir() {
 [ $# -eq 1 ] || { usage; exit 1; }
 
 case "$1" in
+  antigravity|agy)
+    put "$ADAPTERS/antigravity/GEMINI.md" "$ROOT/GEMINI.md"
+    put_dir "$ADAPTERS/antigravity/.agents" "$ROOT/.agents"
+    chmod +x "$ROOT/.agents/hooks/"*.sh 2>/dev/null || true
+    echo "Installed: GEMINI.md, .agents/ (skills, hooks.json, hooks)."
+    echo "Next: open Antigravity here and run /bootstrap"
+    ;;
   claude-code)
     put "$ADAPTERS/claude-code/CLAUDE.md" "$ROOT/CLAUDE.md"
     put_dir "$ADAPTERS/claude-code/.claude" "$ROOT/.claude"

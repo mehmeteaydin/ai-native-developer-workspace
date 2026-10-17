@@ -121,7 +121,16 @@ hasnt "clone inside the working tree: vendor/sub" "a .git FILE (submodule, workt
 
 if [ -f "$W/adapters/cursor/commands/plan.md" ]; then
   reset; rm -f "$W/adapters/cursor/commands/plan.md"
-  doctor;          exits 1 "adapter parity broken"; has "FAIL  adapter parity: plan missing in cursor" "missing adapter command is a failure"
+  doctor;          exits 1 "adapter parity broken (cursor)"; has "FAIL  adapter parity: plan missing in cursor" "missing cursor command is a failure"
+  reset; rm -f "$W/adapters/antigravity/.agents/skills/plan/SKILL.md"
+  doctor;          exits 1 "adapter parity broken (antigravity)"; has "FAIL  adapter parity: plan missing in antigravity" "missing antigravity skill is a failure"
+  reset; run sh "$W/scripts/init" antigravity
+  exits 0 "scripts/init antigravity succeeds"
+  doctor;          has "ok    an AI tool adapter is installed" "doctor detects installed antigravity adapter"
+  run sh -c 'printf '\''{"toolCall":{"name":"write_to_file","args":{"TargetFile":"/repo/specs/done/0001-x.md"}}}'\'' | "$0"' "$W/.agents/hooks/protect-shipped.sh"
+  has '"decision":"deny"' "antigravity hook denies editing specs/done/"
+  run sh -c 'printf '\''{"toolCall":{"name":"run_command","args":{"CommandLine":"git push --force origin main"}}}'\'' | "$0"' "$W/.agents/hooks/safety-guard.sh"
+  has '"decision":"deny"' "antigravity hook denies git push --force"
 else
   echo "skip  adapter parity (no adapters/ in this repo)"
 fi

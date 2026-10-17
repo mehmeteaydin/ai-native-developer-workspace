@@ -1,8 +1,8 @@
-# ANEW — AI Native Engineering Workspace
+# ANDW — AI Native Developer Workspace
 
 **A general-purpose, technology-agnostic bootstrap for building software with AI — under control.**
 
-> It doesn't matter what you're building. ANEW gives you a starting environment where context,
+> It doesn't matter what you're building. ANDW gives you a starting environment where context,
 > decisions, specs, roles, quality gates, and verification are managed in files — not lost in chat.
 
 Use this repo as a GitHub template (or drop it into an existing project), install the adapter for
@@ -13,7 +13,7 @@ dependencies, no code generators — a working *system*, written in Markdown plu
 
 AI lowers development latency — and amplifies decision errors. A misunderstood requirement once
 cost a developer two weeks; an agent now ships the same misunderstanding in twenty minutes, with
-green tests. The bottleneck has moved from writing code to deciding correctly and proving it. ANEW
+green tests. The bottleneck has moved from writing code to deciding correctly and proving it. ANDW
 is built for that bottleneck: it does not make the AI write more code; it makes the AI work inside
 an engineering process.
 
@@ -28,7 +28,7 @@ mechanical channels:
 3. **Rules it cannot bypass.** Prose is advice; tooling is law. Hooks, permission denies, and CI
    gates don't rely on the agent remembering anything.
 
-Every file in ANEW connects to one of these channels — plus one more thing prose can't give you:
+Every file in ANDW connects to one of these channels — plus one more thing prose can't give you:
 **process memory.** Intent, decisions, and evidence live in files that survive every session.
 
 ## The three layers
@@ -36,17 +36,17 @@ Every file in ANEW connects to one of these channels — plus one more thing pro
 | Layer | What | Ages with |
 |---|---|---|
 | **Core** (`docs/`, `specs/`, `workflows/`, `prompts/`, `scripts/`, `AGENTS.md`) | The system: context, specs, ADRs, roles, gates, verification, recovery. 100% tool- and stack-agnostic. | Engineering practice (slowly) |
-| **Adapters** (`adapters/`) | Thin per-tool wiring: Claude Code, GitHub Copilot, Cursor, generic. Pointers + tool-specific extras only — rules are never duplicated here. | AI tools (they change; core doesn't) |
+| **Adapters** (`adapters/`) | Thin per-tool wiring: Antigravity (Gemini), Claude Code, GitHub Copilot, Cursor, generic. Pointers + tool-specific extras only — rules are never duplicated here. | AI tools (they change; core doesn't) |
 | **Packs** (roadmap) | Optional stack presets (JVM/Spring, Node, Python, React): conventions/testing/CI suggestions. Not in v1 — the core works without them. | Ecosystems |
 
 ## Quickstart
 
 ```bash
 # 1. Use this template on GitHub (or copy the files into an existing repo), then:
-./scripts/init claude-code        # or: github-copilot | cursor | generic
+./scripts/init antigravity        # or: claude-code | github-copilot | cursor | generic
 
 # 2. Open your AI tool and run the bootstrap workflow
-#    Claude Code / Cursor / Copilot:  /bootstrap
+#    Antigravity / Claude Code / Cursor / Copilot:  /bootstrap
 #    Other tools:  paste prompts/bootstrap.md
 
 # 3. The AI first asks two things: interview language and document language (recorded in
@@ -55,7 +55,7 @@ Every file in ANEW connects to one of these channels — plus one more thing pro
 
 ./scripts/doctor                  # 4. Confirm the workspace is healthy
 
-# 5. Start your first feature (Claude Code, Cursor and Copilot share the same commands)
+# 5. Start your first feature (Antigravity, Claude Code, Cursor and Copilot share the same commands)
 #    lite mode:     /new-feature "short description"    # chains the segments, asks at each gate
 #    strict mode:   /analyze "short description"        # one segment per role, one role per session
 #    existing behavior must change:  /change "<request> <work item>"
@@ -88,16 +88,17 @@ Each stage is a *segment* with an entry condition and a handoff written to files
 |---|---|---|
 | `/new-feature "<feature>"` | **Lite: start here.** Chainer — runs the segments below in order and asks at every gate. In `strict` it refuses and redirects to the segment commands. | Each gate |
 | `/analyze "<feature>"` | Intent → clarify → spec (+ self-critique); refuses to open a twin spec | Spec `Status: Approved` → "Next: /plan" |
-| `/plan <NNNN>` | Plan from the spec; **refuses unless the spec is Approved** | Approval recorded in the plan → "Next: /build" |
+| `/plan <NNNN>` | Plan from the spec; **refuses unless the spec is Approved** (Antigravity also exposes `/anew-plan` as a non-colliding alias) | Approval recorded in the plan → "Next: /build" |
 | `/build <NNNN>` | Implements the plan; **refuses unless `Approved by / on` is filled**; sets `In progress` | `scripts/check` green with output → "Next: /review" |
 | `/review <NNNN>` | Independent review — read-only where the tool supports it (see "How strongly is each rule held?") | Findings report → human triage |
 | `/verify <NNNN>` | QA: criterion ↔ evidence table | Table → human ship |
 | `/change "<request> <work item>"` | Change an existing behavior: triage rubric (bug → `/fix-bug` · trivial → one commit per `docs/git.md` policy · change → mini-spec lane), then the lane by mode (`workflows/change-request.md`) | Triage verdict; then the lane's gates |
-| `/bootstrap` · `/fix-bug` · `/refactor` · `/adr` · `/recover` | Other workflows — same commands in Claude Code, Cursor and Copilot; any other tool pastes the prompts | Their gates |
+| `/bootstrap` · `/fix-bug` · `/refactor` · `/adr` · `/recover` | Other workflows — same commands in Antigravity, Claude Code, Cursor and Copilot; any other tool pastes the prompts | Their gates |
 
-Claude Code and Cursor expose these as slash commands, GitHub Copilot as prompt files, and any
-other tool by pasting the prompts (`adapters/generic/README.md`). CI runs `scripts/doctor --strict`,
-so the spec/plan gates hold whichever tool produced the PR.
+Antigravity exposes these as workspace skills (`.agents/skills/<name>/SKILL.md`), Claude Code and
+Cursor as slash commands, GitHub Copilot as prompt files, and any other tool by pasting the prompts
+(`adapters/generic/README.md`). CI runs `scripts/doctor --strict`, so the spec/plan gates hold
+whichever tool produced the PR.
 
 ### Two operating modes
 
@@ -121,19 +122,19 @@ Not every rule is held the same way, and not every tool can hold it the same way
 - **Validated** — a script detects a violation (`scripts/doctor` / `scripts/check`, locally and in CI).
 - **Enforced** — the tool physically prevents the action.
 
-| Rule | Claude Code | GitHub Copilot | Cursor | Other tools |
-|---|---|---|---|---|
-| Spec approved before plan | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) |
-| Plan approval recorded before build | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) |
-| Who approved the plan | Documented | Documented | Documented | Documented |
-| Producer ≠ verifier | Enforced (reviewer subagent has no Edit/Write; Bash kept for `scripts/check`, instructed never to write) | Enforced (reviewer agent, no edit tools; `runCommands` kept) | Documented (fresh chat) | Documented (fresh session) |
-| Shipped specs immutable | Enforced (hook, editor tools) + Validated (CI) | Documented (instruction) + Validated (CI) | Documented (rule) + Validated (CI) | Validated (CI) |
-| No force-push / hard reset | Enforced (permission deny) | Documented | Documented | Documented |
-| "Done" = `scripts/check` green | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) |
-| Evidence is referenced, not stored (no `evidence/`, no repo clone inside the repo) | Validated (doctor warns, every mode) | Validated (doctor warns, every mode) | Validated (doctor warns, every mode) | Validated (doctor warns, every mode) |
-| `scripts/check` leaves nothing running | Documented (the residue test runs once, at bootstrap) | Documented (same) | Documented (same) | Documented (same) |
-| UI specs define flow, states and the design link | Documented | Documented | Documented | Documented |
-| Evidence cites the full profile, not `--fast` | Documented (the `(full, n)` / `(fast, n)` label shows it to the reviewer) | Documented (same label) | Documented (same label) | Documented (same label) |
+| Rule | Antigravity (Gemini) | Claude Code | GitHub Copilot | Cursor | Other tools |
+|---|---|---|---|---|---|
+| Spec approved before plan | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) |
+| Plan approval recorded before build | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) |
+| Who approved the plan | Documented | Documented | Documented | Documented | Documented |
+| Producer ≠ verifier | Enforced (`anew-reviewer` subagent via `define_subagent` with `enable_write_tools: false`) | Enforced (reviewer subagent has no Edit/Write; Bash kept for `scripts/check`, instructed never to write) | Enforced (reviewer agent, no edit tools; `runCommands` kept) | Documented (fresh chat) | Documented (fresh session) |
+| Shipped specs immutable | Enforced (`PreToolUse` hook on file/shell tools) + Validated (CI) | Enforced (hook, editor tools) + Validated (CI) | Documented (instruction) + Validated (CI) | Documented (rule) + Validated (CI) | Validated (CI) |
+| No force-push / hard reset | Enforced (`PreToolUse` `safety-guard` hook) | Enforced (permission deny) | Documented | Documented | Documented |
+| "Done" = `scripts/check` green | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) | Validated (CI) |
+| Evidence is referenced, not stored (no `evidence/`, no repo clone inside the repo) | Validated (doctor warns, every mode) | Validated (doctor warns, every mode) | Validated (doctor warns, every mode) | Validated (doctor warns, every mode) | Validated (doctor warns, every mode) |
+| `scripts/check` leaves nothing running | Documented (the residue test runs once, at bootstrap) | Documented (same) | Documented (same) | Documented (same) | Documented (same) |
+| UI specs define flow, states and the design link | Documented | Documented | Documented | Documented | Documented |
+| Evidence cites the full profile, not `--fast` | Documented (the `(full, n)` / `(fast, n)` label shows it to the reviewer) | Documented (same label) | Documented (same label) | Documented (same label) | Documented (same label) |
 
 Segment commands also refuse out-of-order work (entry checks) — that is the agent following a
 Documented rule; CI is what makes it Validated.
@@ -149,7 +150,7 @@ branch protection setting makes "no force-push" Enforced for every tool.
 |---|---|
 | `AGENTS.md` | The signpost every agent auto-loads: invariant rules, operating mode, where everything lives. Rewritten by bootstrap; invariants survive. |
 | `docs/` | Long-term memory: architecture, domain language, conventions, testing, security, git rules — templates filled at bootstrap. |
-| `docs/decisions/` | ADRs — decisions with rationale, so "why" survives the people and the sessions. ANEW's own design decisions are recorded there (ADR 0001 onward). |
+| `docs/decisions/` | ADRs — decisions with rationale, so "why" survives the people and the sessions. ANDW's own design decisions are recorded there (ADR 0001 onward). |
 | `docs/roles/` | Role cards bound to responsibility, not technology: analyst, developer, reviewer, QA. Producer and verifier are never the same session. |
 | `specs/` | One spec per piece of work: intent, behavior, testable acceptance criteria (`TEMPLATE-mini.md` for behavior changes: changed + preserved criteria). `active/` → `done/` (immutable once shipped). Plans live in `specs/plans/`. |
 | `workflows/` | The processes: bootstrap, feature-development, change-request, bug-fix, refactor, incident. Steps, roles, gates, evidence — each step points to its prompt. `segments.md` defines the feature stages as stop-at-handoff segments that every adapter maps onto. |
@@ -188,10 +189,10 @@ The agent cannot pass locally and fail in CI by running different commands. It h
 
 ## Scope
 
-ANEW governs the path from intent to merge: context, specification, plan, authorization,
+ANDW governs the path from intent to merge: context, specification, plan, authorization,
 implementation, independent review, evidence. Release, deployment and production operations are
 deliberately out of scope — that is where organizations differ most and already have tooling;
-ANEW connects to it through `scripts/check` and CI instead of replacing it. The incident workflow
+ANDW connects to it through `scripts/check` and CI instead of replacing it. The incident workflow
 (`workflows/incident.md`) is the existing bridge back from production into this loop.
 
 ## Adapting it
@@ -207,10 +208,7 @@ Everything is plain Markdown and POSIX shell — edit, don't fork the philosophy
 
 ## Origin
 
-ANEW distills the methodology behind the course *AI-Native Software Engineering* by
-[Engin Demiroğ](https://www.udemy.com/user/engindemirog/) — where the full discipline is taught by
-building a production system from an empty folder. The workspace is the system; the course is the
-mastery of it.
+**ANDW (AI Native Developer Workspace)** is adapted and maintained by [Mehmet E. Aydın](https://github.com/mehmeteaydin/ai-native-developer-workspace) with first-class Google Antigravity and Gemini customization (`adapters/antigravity/`), building upon ANEW — the methodology behind the course *AI-Native Software Engineering* by [Engin Demiroğ](https://www.udemy.com/user/engindemirog/).
 
 ## License
 
