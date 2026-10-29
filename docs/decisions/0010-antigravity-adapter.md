@@ -17,15 +17,22 @@ decisions.
 ## Decision
 Add `adapters/antigravity/` (installed via `./scripts/init antigravity` or `./scripts/init agy`) as
 a thin adapter following ADR 0001 and ADR 0004:
-1. **Context pointer (`GEMINI.md`):** Points to `AGENTS.md` as the single source of truth and
-   instructs the agent to use `ask_question` with `(Recommended)` on the first option during
-   interviews and human gates (proposal rule).
+1. **Context pointer & Interactive Gate Protocol (`GEMINI.md`):** Points to `AGENTS.md` as the
+   single source of truth and defines the **Antigravity Interactive Gate & Artifact Protocol**:
+   at every gate (`SPEC`, `PLAN`, `BUILD → REVIEW`, `REVIEW → TRIAGE`, `VERIFY → SHIP`), the agent
+   writes a user-facing Artifact (`RequestFeedback: true` so the user gets an inline **Review /
+   Proceed** button in the side panel) AND presents a one-click `ask_question` card with
+   `(Recommended)` on the first option. Clicking **Proceed** automatically syncs any artifact edits
+   back to the repo files, records protocol fields (`Status: Approved`, `Approved by / on: <name>,
+   <YYYY-MM-DD>` from `git config user.name`, DoD + Scorecard + `git mv` to `specs/done/`), and
+   transitions straight into the next segment without requiring the user to type `/plan`, `/build`,
+   `/review`, or `/verify` manually.
 2. **Workspace skills (`.agents/skills/<name>/SKILL.md`):** All 12 core commands (`bootstrap`,
    `analyze`, `plan`, `build`, `review`, `verify`, `new-feature`, `change`, `fix-bug`, `refactor`,
    `adr`, `recover`) are exposed as progressive-disclosure skills, plus `anew-plan` as a fallback
    alias in case `/plan` collides with Antigravity's built-in `/plan` mode.
 3. **Enforced independent review:** `/review` and `/new-feature` use `define_subagent`
-   (`enable_write_tools: false`) + `invoke_subagent` to run `anew-reviewer` in an isolated,
+   (`EnableWriteTools: false`) + `invoke_subagent` to run `anew-reviewer` in an isolated,
    read-only subagent context.
 4. **Enforced immutability and safety hooks (`.agents/hooks.json`):** `protect-shipped.sh` blocks
    modifications to `specs/done/` across file-writing tools and `run_command`; `safety-guard.sh`

@@ -5,10 +5,11 @@ the core is Markdown plus a few POSIX scripts, so upgrades are file copies, not 
 
 ## v1.9 — First-class Antigravity (Gemini) adapter
 
-- `adapters/antigravity/`: first-class adapter for Google Antigravity and Gemini models (`./scripts/init antigravity` or `./scripts/init agy`). Installs `GEMINI.md` (thin pointer to `AGENTS.md` + `ask_question` guidance for the proposal rule), `.agents/skills/<name>/SKILL.md` for all 12 workflow/segment commands (plus `/anew-plan` as a non-colliding alias for `/plan`), and `.agents/hooks.json` with two `PreToolUse` lifecycle hooks:
+- `adapters/antigravity/`: first-class adapter for Google Antigravity and Gemini models (`./scripts/init antigravity` or `./scripts/init agy`). Installs `GEMINI.md` (thin pointer to `AGENTS.md` + Interactive Gate & Artifact Protocol), `.agents/skills/<name>/SKILL.md` for all 12 workflow/segment commands (plus `/anew-plan` as a non-colliding alias for `/plan`), and `.agents/hooks.json` with two `PreToolUse` lifecycle hooks:
   - `protect-shipped.sh`: enforces `specs/done/` immutability (`decision: "deny"`) across both file-edit tools (`TargetFile`) and shell commands (`CommandLine`).
   - `safety-guard.sh`: enforces denial of destructive git and filesystem commands (`git push --force`, `git reset --hard`, `git rebase`, `rm -rf`).
-- Producer ≠ verifier (`AGENTS.md` rule 3) is **Enforced** in Antigravity: `/review` and `/new-feature` dynamically define and invoke a read-only `anew-reviewer` subagent (`define_subagent` with `enable_write_tools: false` + `invoke_subagent`).
+- **One-Click Interactive Gates (Artifacts + Proceed):** At all 5 gates (`SPEC`, `PLAN`, `BUILD → REVIEW`, `REVIEW → TRIAGE`, `VERIFY → SHIP`), Antigravity skills mirror the stage output to a user-facing Artifact (`RequestFeedback: true` with an inline **Review / Proceed** button) alongside a one-click `ask_question` approval card. Clicking **Proceed** automatically syncs edits, fills protocol metadata (`Status: Approved`, `Approved by / on: <git user>, <YYYY-MM-DD>`, DoD + Scorecard + `git mv` to `specs/done/`), and transitions directly into the next segment without typing `/plan`, `/build`, `/review`, or `/verify` by hand.
+- Producer ≠ verifier (`AGENTS.md` rule 3) is **Enforced** in Antigravity: `/review` and `/new-feature` dynamically define and invoke a read-only `anew-reviewer` subagent (`define_subagent` with `EnableWriteTools: false` + `invoke_subagent`).
 - `scripts/doctor` and `scripts/selftest`: validate Antigravity adapter presence, 12-command skill parity, hook executable bits, and hook `deny` behavior.
 - README enforcement table gains the **Antigravity (Gemini)** column; ADR 0010 records the adapter design decisions.
 

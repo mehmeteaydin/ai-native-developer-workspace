@@ -95,8 +95,12 @@ Each stage is a *segment* with an entry condition and a handoff written to files
 | `/change "<request> <work item>"` | Change an existing behavior: triage rubric (bug → `/fix-bug` · trivial → one commit per `docs/git.md` policy · change → mini-spec lane), then the lane by mode (`workflows/change-request.md`) | Triage verdict; then the lane's gates |
 | `/bootstrap` · `/fix-bug` · `/refactor` · `/adr` · `/recover` | Other workflows — same commands in Antigravity, Claude Code, Cursor and Copilot; any other tool pastes the prompts | Their gates |
 
-Antigravity exposes these as workspace skills (`.agents/skills/<name>/SKILL.md`), Claude Code and
-Cursor as slash commands, GitHub Copilot as prompt files, and any other tool by pasting the prompts
+Antigravity exposes these as workspace skills (`.agents/skills/<name>/SKILL.md`) and additionally
+surfaces an interactive **Artifact (`RequestFeedback: true` — Review / Proceed button)** +
+**one-click `ask_question` card** at every gate (`SPEC → PLAN → BUILD → REVIEW → VERIFY → SHIP`),
+so you can review and advance to the next stage with a single click instead of typing `/plan`,
+`/build`, `/review`, or `/verify` manually. Claude Code and Cursor expose these as slash commands,
+GitHub Copilot as prompt files, and any other tool by pasting the prompts
 (`adapters/generic/README.md`). CI runs `scripts/doctor --strict`, so the spec/plan gates hold
 whichever tool produced the PR.
 
