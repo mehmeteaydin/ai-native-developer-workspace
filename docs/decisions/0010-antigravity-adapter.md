@@ -34,9 +34,10 @@ a thin adapter following ADR 0001 and ADR 0004:
 3. **Enforced independent review:** `/review` and `/new-feature` use `define_subagent`
    (`EnableWriteTools: false`) + `invoke_subagent` to run `anew-reviewer` in an isolated,
    read-only subagent context.
-4. **Enforced immutability and safety hooks (`.agents/hooks.json`):** `protect-shipped.sh` blocks
-   modifications to `specs/done/` across file-writing tools and `run_command`; `safety-guard.sh`
-   blocks `git push --force`, `git reset --hard`, `git rebase`, and `rm -rf`.
+4. **Enforced immutability, auto-approved verification, and session context hooks (`.agents/hooks.json`):**
+   - `session-start.sh` (`SessionStart`): reads `AGENTS.md`, `specs/active/`, and `specs/plans/` when a conversation starts and injects a `systemMessage` summarizing the active mode, language, and open spec/plan gate status.
+   - `protect-shipped.sh` (`PreToolUse`): blocks modifications to `specs/done/` across file-writing tools (`Path` / `TargetFile`) and `run_command`.
+   - `safety-guard.sh` (`PreToolUse`): blocks `git push --force`, `git reset --hard`, `git rebase`, and `rm -rf` with `decision: "deny"`, while automatically granting `decision: "allow"` + `permissionOverrides` for trusted project scripts (`./scripts/check`, `./scripts/doctor`, `./scripts/selftest`, `./scripts/init`), commands listed in `scripts/check.conf`, and safe local git operations so the agent never interrupts the user for routine verification permissions.
 5. **Doctor & selftest parity:** `scripts/doctor` verifies that every Claude Code command has a
    matching skill in `adapters/antigravity/.agents/skills/<name>/SKILL.md` and checks hook
    permissions; `scripts/selftest` tests `scripts/init antigravity` and both hooks.

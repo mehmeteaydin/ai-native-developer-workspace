@@ -1,8 +1,16 @@
 {
+  "session-context": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "./hooks/session-start.sh"
+      }
+    ]
+  },
   "protect-shipped-specs": {
     "PreToolUse": [
       {
-        "matcher": "write_to_file|replace_file_content|multi_replace_file_content|run_command",
+        "matcher": "write_file|edit_file|write_to_file|replace_file_content|multi_replace_file_content|run_command",
         "hooks": [
           {
             "type": "command",
@@ -12,7 +20,7 @@
       }
     ]
   },
-  "safety-guard": {
+  "safety-and-auto-approve": {
     "PreToolUse": [
       {
         "matcher": "run_command",
@@ -26,4 +34,3 @@
     ]
   }
 }
-

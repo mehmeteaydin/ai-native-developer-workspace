@@ -29,3 +29,13 @@ human gate, always combine **Antigravity Artifacts** (`write_file` / `edit_file`
    - Write the criterion ↔ evidence table and DoD checklist to `<artifactDir>/<NNNN>-ship-report.md` (`RequestFeedback: true`).
    - Call `ask_question` with `(Recommended) Approve & SHIP — check off DoD, fill Scorecard, set Status: Shipped, and move spec to specs/done/`.
    - On Proceed, automatically mark all DoD items `[x]`, fill the Scorecard table in the spec, set `Status: Shipped`, and move `specs/active/<NNNN>-<name>.md` to `specs/done/<NNNN>-<name>.md` (`git mv` if tracked, else `mv`), then present the final ship summary.
+
+## Zero-Prompt Auto-Approved Verification Commands
+
+`.agents/hooks.json` registers `safety-guard.sh` on `PreToolUse` (`run_command`), which automatically returns `{"decision":"allow","permissionOverrides":["command(...)"]}` for:
+- Core workspace scripts: `./scripts/check` (and `--fast`), `./scripts/doctor`, `./scripts/selftest`, `./scripts/init`
+- Every build/test/lint command configured inside `scripts/check.conf`
+- Safe local git operations (`git status`, `git diff`, `git log`, `git branch`, `git add`, `git commit`, `git mv`, `git checkout -b`, `git switch -c`)
+
+Run these project scripts proactively inside the standard sandbox (`BypassSandbox: false`) without asking the user for manual command approval.
+

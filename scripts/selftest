@@ -127,10 +127,14 @@ if [ -f "$W/adapters/cursor/commands/plan.md" ]; then
   reset; run sh "$W/scripts/init" antigravity
   exits 0 "scripts/init antigravity succeeds"
   doctor;          has "ok    an AI tool adapter is installed" "doctor detects installed antigravity adapter"
-  run sh -c 'printf '\''{"toolCall":{"name":"write_to_file","args":{"TargetFile":"/repo/specs/done/0001-x.md"}}}'\'' | "$0"' "$W/.agents/hooks/protect-shipped.sh"
+  run sh -c 'printf '\''{"toolCall":{"name":"write_file","args":{"Path":"/repo/specs/done/0001-x.md"}}}'\'' | "$0"' "$W/.agents/hooks/protect-shipped.sh"
   has '"decision":"deny"' "antigravity hook denies editing specs/done/"
   run sh -c 'printf '\''{"toolCall":{"name":"run_command","args":{"CommandLine":"git push --force origin main"}}}'\'' | "$0"' "$W/.agents/hooks/safety-guard.sh"
   has '"decision":"deny"' "antigravity hook denies git push --force"
+  run sh -c 'printf '\''{"toolCall":{"name":"run_command","args":{"CommandLine":"./scripts/check --fast"}}}'\'' | "$0"' "$W/.agents/hooks/safety-guard.sh"
+  has '"permissionOverrides":["command(./scripts/check --fast)"]' "antigravity hook auto-approves ./scripts/check with permissionOverrides"
+  run sh -c 'printf '\''{}'\'' | "$0"' "$W/.agents/hooks/session-start.sh"
+  has '"injectSteps"' "antigravity SessionStart hook injects workspace status context"
 else
   echo "skip  adapter parity (no adapters/ in this repo)"
 fi
